@@ -42,7 +42,6 @@
     </div>
 
     <script>
-
         const requestFullScreen = async () => {
             let element = await document.documentElement;
             let requestMethod =
@@ -214,8 +213,10 @@
                 .catch(error => {
                     console.error('Feil ved henting av data:', error);
                     resultText2.innerHTML = "Feil ved henting av data!";
-                });
+                });  
         }
+
+       
     </script>
 </body>
 </html>
