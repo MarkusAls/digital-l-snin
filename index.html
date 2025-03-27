@@ -18,15 +18,10 @@
 
         /* Styling for the result container */
         #searchResult {
-            
             text-align: center;
         }
 
-        /* Styling for the result text */
-        #resultText {
-            
-            
-        }
+        
     </style>
 
     <meta charset="UTF-8">
@@ -43,10 +38,35 @@
     </div>
 
     <div id="searchResult">
-        <p id="resultText">Skann en Strekkode for å sjekke VISID.</p>
+        <p id="resultText">Skann en Strekkode for å sjekke Elev Id.</p>
     </div>
 
     <script>
+
+        const requestFullScreen = async () => {
+            let element = await document.documentElement;
+            let requestMethod =
+            element.requestFullScreen ||
+            element.webkitRequestFullScreen ||
+            element.mozRequestFullScreen ||
+            element.msRequestFullScreen;
+            if (requestMethod) {
+            requestMethod.call(element);
+            return true;
+            } else if (typeof window.ActiveXObject !== "undefined") {
+            let wscript = new ActiveXObject("WScript.Shell");
+            if (wscript !== null) {
+                wscript.SendKeys("{F11}");
+                return true;
+            }
+            }
+        }
+
+        const lock = async () => {
+            var myScreenOrientation = window.screen.orientation;
+            myScreenOrientation.lock(myScreenOrientation.type);
+            return true;
+        }
         // Firebase konfigurasjon
         const firebaseConfig = {
             apiKey: "AIzaSyDtx8J7NBELBdhWrPgiFyWrOtiMSYerJbo",
