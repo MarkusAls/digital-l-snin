@@ -2,21 +2,30 @@
 <html lang="en">
 <head>
     <style>
-        body{
+        body {
             font-size: 23px;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            margin-top: 10px;
         }
 
+        /* Style for the QR scanner */
         #reader {
-            width: 200px; /* Set QR scanner width */
+            width: 100%; /* Use 100% width of the viewport */
+            
         }
 
-        #videoElement {
-            width: 200px; /* Set video feed width */
-            height: auto;
-        }
-
+        /* Styling for the result container */
         #searchResult {
-            margin-top: 20px;
+            
+            text-align: center;
+        }
+
+        /* Styling for the result text */
+        #resultText {
+            
+            
         }
     </style>
 
@@ -30,7 +39,6 @@
 <body>
 
     <div>
-        <h3>Skann Strekkode-kode:</h3>
         <div id="reader"></div> <!-- Kamera-feed for QR-skanning -->
     </div>
 
@@ -83,11 +91,15 @@
                 });
 
             const html5QrCode = new Html5Qrcode("reader");
+
+            // Calculate the width of 100vw in pixels
+            const qrBoxWidth = window.innerWidth; // This gives you 100vw in pixels
+
             html5QrCode.start(
                 { facingMode: "environment" }, // Use the back camera
                 {
                     fps: 10, // Frames per second
-                    qrbox: { width: 200, height: 200 }, // Set QR box size to 200px
+                    qrbox: { width: qrBoxWidth, height: qrBoxWidth * 0.5 }, // Use 100vw for width and 50% of it for height
                     numOfWorkers: 4, // Use multiple workers for faster processing
                     disableFlip: false // Disable automatic flipping if the camera is inverted
                 },
