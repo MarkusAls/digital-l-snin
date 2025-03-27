@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        body{
+            font-size:30px;
+        }
+
+    </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Firebase QR Scan</title>
@@ -69,7 +76,7 @@
             html5QrCode.start(
                 { facingMode: "environment" }, // Use the back camera
                 {
-                    fps: 10, // Frames per second
+                    fps: 120, // Frames per second
                     qrbox: { width: 400, height: 400 }, // Increase the size of the QR box
                     numOfWorkers: 4, // Use multiple workers for faster processing
                     disableFlip: false // Disable automatic flipping if the camera is inverted
@@ -113,9 +120,9 @@
                                 foundKey = key; // Lagre nøkkel for registrering senere
 
                                 resultText1.innerHTML = `
-                                    <strong>Fornavn:</strong> ${data[key].Fornavn} <br>
-                                    <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
-                                    <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
+                                    <strong>Fornavn:</strong></span> ${data[key].Fornavn} <br>
+                                    <strong>Etternavn:</strong></span> ${data[key].Etternavn} <br>
+                                    <strong>Elev Id:</strong></span> ${data[key].VISID} <br>`;
                                 bekreftelse();
                             }
                         }
@@ -145,7 +152,7 @@
                     const userData = snapshot.val();
 
                     if (userData && userData.Status === true) {
-                        resultText2.innerHTML += `<br><span style="color: red; font-weight: bold;">❌ Denne Elev Id-en er allerede registrert!</span>`;
+                        resultText2.innerHTML += `<br><span style="color: red; font-size:30px; font-weight: bold;">❌ Denne Elev Id-en er allerede registrert!</span>`;
                         return;
                     }
 
