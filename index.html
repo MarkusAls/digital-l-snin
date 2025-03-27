@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase QR Scan</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script> <!-- QR-skanner bibliotek -->
+</head>
+<body>
+    <h1>Firebase QR Scanner</h1>
+
+    <div>
+        <h3>Skann QR-kode:</h3>
+        <div id="reader" style="width: 300px;"></div> <!-- Kamera-feed for QR-skanning -->
+        <p><strong>VISID:</strong> <span id="scannedVISID">Ingen QR skannet</span></p>
+        
+    </div>
+
+    <div id="searchResult">
+        <h3>Resultat:</h3>
+        <p id="resultText">Skann en QR-kode for å sjekke VISID.</p>
+    </div>
+
+    
+
+    <script>
+
+        // Firebase konfigurasjon
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2pCJRGFQkuQWnOQCgAlQjuiyMDf4mfcI",
+            authDomain: "test-f0657.firebaseapp.com",
+            databaseURL: "https://test-f0657-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "test-f0657",
+            storageBucket: "test-f0657.firebasestorage.app",
+            messagingSenderId: "116998370250",
+            appId: "1:116998370250:web:f3bc39fc48cf8f2db75533"
+        };
+
+        // Initialiser Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let foundKey = null; // Holder på nøkkelen til VISID vi finner
+        
+        window.onload = startQRScanner;
+
+        // Start QR-kodeskanner
+        function startQRScanner() {
+            const text = document.getElementById("resultText"); // Reference to the element where error will be displayed
+
+            // Access the camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    document.getElementById("videoElement").srcObject = stream;
+                })
+                .catch(error => {
+                    text.innerHTML = `Kameratilgang nektet: ${error}`; // Corrected template literal
+                });
+
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" }, // Bruk bakre kamera
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                (decodedText) => {
+                    document.getElementById("scannedVISID").innerText = decodedText;
+                    searchVISID(decodedText);
+                },
+                (errorMessage) => {
+                    console.warn("QR-skanning feilet:", errorMessage);
+                }
+            ).catch((err) => {
+                console.error("Klarte ikke å starte QR-skanner:", err);
+            });
+        }
+
+        // Funksjon for å søke etter VISID i databasen
+        const searchVISID = (visid) => {
+            const resultText1 = document.getElementById('resultText');
+
+            database.ref('/').once('value')
+                .then((snapshot) => {
+                    const data = snapshot.val();
+                    let found = false;
+
+                    if (data) {
+                        for (const key in data) {
+                            if (data[key].VISID == visid) {
+                                found = true;
+                                foundKey = key; // Lagre nøkkel for registrering senere
+
+                                resultText1.innerHTML = `
+                                    <strong>Fornavn:</strong> ${data[key].Fornavn} <br>
+                                    <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
+                                    <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
+                                    bekreftelse();
+                            }
+                        }
+                    }
+
+                    if (!found) {
+                        resultText1.innerHTML = `<span style="color: red; font-weight: bold;">✖ VISID ikke funnet!</span>`;
+                        foundKey = null;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error searching VISID:', error);
+                    resultText1.innerText = "Feil ved søk!";
+                });
+            }
+
+                function bekreftelse(){
+            const resultText2 = document.getElementById('resultText');
+
+            if (!foundKey) {
+                resultText2.innerText = "Du må skanne en gyldig VISID først!";
+                return;
+            }
+
+            database.ref(`/${foundKey}`).once('value')
+                .then((snapshot) => {
+                    const userData = snapshot.val();
+
+                    if (userData && userData.Status === true) {
+                        resultText2.innerHTML += `<br><span style="color: red; font-weight: bold;">❌ Denne Elev Id-en er allerede registrert!</span>`;
+                        return;
+                    }
+
+                    // Oppdater Status KUN hvis den er false
+                    if (userData.Status === false) {
+                        database.ref(`/${foundKey}`).update({ Status: true })
+                            .then(() => {
+                                resultText2.innerHTML += `<br><span style="color: green; font-weight: bold;">✔ Registrering fullført!</span>`;
+                            })
+                            .catch(error => {
+                                console.error('Feil ved oppdatering av Status:', error);
+                                resultText2.innerHTML += `<br><span style="color: red;">✖ Kunne ikke oppdatere Status!</span>`;
+                            });
+                    } else {
+                        resultText2.innerHTML += `<br><span style="color: red; font-weight: bold;">❌ Status kan ikke endres!</span>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Feil ved henting av data:', error);
+                    resultText2.innerHTML = "Feil ved henting av data!";
+                });
+                
+        };
+    
+        // Funksjon for å registrere VISID og sette Status til true
+
+
+        // Start QR-skanning når siden lastes
+        
+    </script>
+</body>
+</html>
