@@ -3,9 +3,21 @@
 <head>
     <style>
         body{
-            font-size:23px;
+            font-size: 23px;
         }
 
+        #reader {
+            width: 200px; /* Set QR scanner width */
+        }
+
+        #videoElement {
+            width: 200px; /* Set video feed width */
+            height: auto;
+        }
+
+        #searchResult {
+            margin-top: 20px;
+        }
     </style>
 
     <meta charset="UTF-8">
@@ -19,7 +31,7 @@
 
     <div>
         <h3>Skann QR-kode:</h3>
-        <div id="reader" style="width: 300px;"></div> <!-- Kamera-feed for QR-skanning -->
+        <div id="reader"></div> <!-- Kamera-feed for QR-skanning -->
         <p><strong>VISID:</strong> <span id="scannedVISID">Ingen QR skannet</span></p>
     </div>
 
@@ -70,13 +82,12 @@
                     text.innerHTML = errorMessage + ": " + error;
                 });
 
-
             const html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start(
                 { facingMode: "environment" }, // Use the back camera
                 {
-                    fps: 120, // Frames per second
-                    qrbox: { width: 200, height: 200 }, // Increase the size of the QR box
+                    fps: 10, // Frames per second
+                    qrbox: { width: 200, height: 200 }, // Set QR box size to 200px
                     numOfWorkers: 4, // Use multiple workers for faster processing
                     disableFlip: false // Disable automatic flipping if the camera is inverted
                 },
@@ -119,9 +130,9 @@
                                 foundKey = key; // Lagre nøkkel for registrering senere
 
                                 resultText1.innerHTML = `
-                                    <strong>Fornavn:</strong></span> ${data[key].Fornavn} <br>
-                                    <strong>Etternavn:</strong></span> ${data[key].Etternavn} <br>
-                                    <strong>Elev Id:</strong></span> ${data[key].VISID} <br>`;
+                                    <strong>Fornavn:</strong> ${data[key].Fornavn} <br>
+                                    <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
+                                    <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
                                 bekreftelse();
                             }
                         }
@@ -138,7 +149,7 @@
                 });
         }
 
-        function bekreftelse(){
+        function bekreftelse() {
             const resultText2 = document.getElementById('resultText');
 
             if (!foundKey) {
@@ -173,9 +184,7 @@
                     console.error('Feil ved henting av data:', error);
                     resultText2.innerHTML = "Feil ved henting av data!";
                 });
-        };
-    
-        // Funksjon for å registrere VISID og sette Status til true
+        }
     </script>
 </body>
 </html>
