@@ -22,7 +22,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase QR Scan</title>
+    <title>Firebase Strekkode Scan</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script> <!-- QR-skanner bibliotek -->
@@ -30,26 +30,26 @@
 <body>
 
     <div>
-        <h3>Skann QR-kode:</h3>
+        <h3>Skann Strekkode-kode:</h3>
         <div id="reader"></div> <!-- Kamera-feed for QR-skanning -->
-        <p><strong>VISID:</strong> <span id="scannedVISID">Ingen QR skannet</span></p>
     </div>
 
     <div id="searchResult">
         <h3>Resultat:</h3>
-        <p id="resultText">Skann en QR-kode for å sjekke VISID.</p>
+        <p id="resultText">Skann en Strekkode for å sjekke VISID.</p>
     </div>
 
     <script>
         // Firebase konfigurasjon
         const firebaseConfig = {
-            apiKey: "AIzaSyB2pCJRGFQkuQWnOQCgAlQjuiyMDf4mfcI",
-            authDomain: "test-f0657.firebaseapp.com",
-            databaseURL: "https://test-f0657-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "test-f0657",
-            storageBucket: "test-f0657.firebasestorage.app",
-            messagingSenderId: "116998370250",
-            appId: "1:116998370250:web:f3bc39fc48cf8f2db75533"
+            apiKey: "AIzaSyDtx8J7NBELBdhWrPgiFyWrOtiMSYerJbo",
+            authDomain: "test-b24b1.firebaseapp.com",
+            databaseURL: "https://test-b24b1-default-rtdb.firebaseio.com",
+            projectId: "test-b24b1",
+            storageBucket: "test-b24b1.firebasestorage.app",
+            messagingSenderId: "1058078158269",
+            appId: "1:1058078158269:web:10ac5b50c413295e3636d4",
+            measurementId: "G-1CWRF1Z6BQ"
         };
 
         // Initialiser Firebase
@@ -94,7 +94,6 @@
                 (decodedText) => {
                     if (!isScanning) {
                         isScanning = true; // Block further scans temporarily
-                        document.getElementById("scannedVISID").innerText = decodedText;
                         searchVISID(decodedText);
                         
                         // Set a timeout before allowing the next scan
@@ -129,7 +128,8 @@
                                 found = true;
                                 foundKey = key; // Lagre nøkkel for registrering senere
 
-                                resultText1.innerHTML = `
+                                // Now only display Fornavn, Etternavn, and VISID (Elev Id)
+                                resultText1.innerHTML = ` 
                                     <strong>Fornavn:</strong> ${data[key].Fornavn} <br>
                                     <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
