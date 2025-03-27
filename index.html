@@ -15,7 +15,6 @@
         <h3>Skann QR-kode:</h3>
         <div id="reader" style="width: 300px;"></div> <!-- Kamera-feed for QR-skanning -->
         <p><strong>VISID:</strong> <span id="scannedVISID">Ingen QR skannet</span></p>
-        
     </div>
 
     <div id="searchResult">
@@ -23,10 +22,7 @@
         <p id="resultText">Skann en QR-kode for å sjekke VISID.</p>
     </div>
 
-    
-
     <script>
-
         // Firebase konfigurasjon
         const firebaseConfig = {
             apiKey: "AIzaSyB2pCJRGFQkuQWnOQCgAlQjuiyMDf4mfcI",
@@ -46,6 +42,8 @@
         
         window.onload = startQRScanner;
 
+        let isScanning = false; // Flag to prevent scanning too frequently
+
         // Start QR-kodeskanner
         function startQRScanner() {
             const text = document.getElementById("resultText"); // Reference to the element where error will be displayed
@@ -53,7 +51,7 @@
             // Access the camera
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
-                    document.getElementById("videoElement").srcObject = stream;
+                    // We don't need to manually display the camera feed here, html5-qrcode manages it within the reader div
                 })
                 .catch(error => {
                     text.innerHTML = `Kameratilgang nektet: ${error}`; // Corrected template literal
@@ -61,17 +59,30 @@
 
             const html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start(
-                { facingMode: "environment" }, // Bruk bakre kamera
+                { facingMode: "environment" }, // Use the back camera
                 {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 }
+                    fps: 10, // Frames per second
+                    qrbox: { width: 400, height: 400 }, // Increase the size of the QR box
+                    numOfWorkers: 4, // Use multiple workers for faster processing
+                    disableFlip: false // Disable automatic flipping if the camera is inverted
                 },
                 (decodedText) => {
-                    document.getElementById("scannedVISID").innerText = decodedText;
-                    searchVISID(decodedText);
+                    if (!isScanning) {
+                        isScanning = true; // Block further scans temporarily
+                        document.getElementById("scannedVISID").innerText = decodedText;
+                        searchVISID(decodedText);
+                        
+                        // Set a timeout before allowing the next scan
+                        setTimeout(() => {
+                            isScanning = false; // Allow scanning again
+                        }, 3000); // Delay in milliseconds (e.g., 1000 ms = 1 second)
+                    }
                 },
                 (errorMessage) => {
-                    console.warn("QR-skanning feilet:", errorMessage);
+                    // Only log the error if needed
+                    if (errorMessage && !errorMessage.includes("No MultiFormat Readers")) {
+                        console.warn("QR-skanning feilet:", errorMessage);
+                    }
                 }
             ).catch((err) => {
                 console.error("Klarte ikke å starte QR-skanner:", err);
@@ -97,7 +108,7 @@
                                     <strong>Fornavn:</strong> ${data[key].Fornavn} <br>
                                     <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
-                                    bekreftelse();
+                                bekreftelse();
                             }
                         }
                     }
@@ -111,9 +122,9 @@
                     console.error('Error searching VISID:', error);
                     resultText1.innerText = "Feil ved søk!";
                 });
-            }
+        }
 
-                function bekreftelse(){
+        function bekreftelse(){
             const resultText2 = document.getElementById('resultText');
 
             if (!foundKey) {
@@ -148,14 +159,9 @@
                     console.error('Feil ved henting av data:', error);
                     resultText2.innerHTML = "Feil ved henting av data!";
                 });
-                
         };
     
         // Funksjon for å registrere VISID og sette Status til true
-
-
-        // Start QR-skanning når siden lastes
-        
     </script>
 </body>
 </html>
