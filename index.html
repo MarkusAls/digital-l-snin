@@ -43,7 +43,6 @@
     </div>
 
     <div id="searchResult">
-        <h3>Resultat:</h3>
         <p id="resultText">Skann en Strekkode for å sjekke VISID.</p>
     </div>
 
@@ -111,7 +110,7 @@
                         // Set a timeout before allowing the next scan
                         setTimeout(() => {
                             isScanning = false; // Allow scanning again
-                        }, 3000); // Delay in milliseconds (e.g., 1000 ms = 1 second)
+                        }, 5000); // Delay in milliseconds (e.g., 1000 ms = 1 second)
                     }
                 },
                 (errorMessage) => {
