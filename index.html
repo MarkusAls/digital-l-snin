@@ -51,11 +51,19 @@
             // Access the camera
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
-                    // We don't need to manually display the camera feed here, html5-qrcode manages it within the reader div
+                    // Kamera stream er nå tilgjengelig, kan brukes i html5-qrcode
                 })
                 .catch(error => {
-                    text.innerHTML = `Kameratilgang nektet: ${error}`; // Corrected template literal
+                    // Håndtere feilmeldinger spesifikt
+                    let errorMessage = "Kameratilgang nektet";
+                    if (error.name === 'NotFoundError') {
+                        errorMessage = "Ingen kamera funnet på enheten.";
+                    } else if (error.name === 'NotAllowedError') {
+                        errorMessage = "Appen har ikke tilgang til kameraet.";
+                    }
+                    text.innerHTML = errorMessage + ": " + error;
                 });
+
 
             const html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start(
