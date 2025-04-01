@@ -121,14 +121,6 @@
                         }, 5000); // Delay in milliseconds (e.g., 5000 ms = 5 seconds)
                     }
                 },
-                (errorMessage) => {
-                    // Log scanning failure (if any)
-                    console.warn("QR-skanning feilet:", errorMessage);
-                }
-            ).catch((err) => {
-                console.error("Klarte ikke å starte QR-skanner:", err);
-            })
-        }
 
         // Search for VISID in the Firebase database
         const searchVISID = (visid) => {
