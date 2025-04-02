@@ -48,6 +48,7 @@
     <script src="https://unpkg.com/html5-qrcode"></script> <!-- QR-scanner library -->
 </head>
 <body>
+    <audio id="audio" src="scan.mp3" preload="auto"></audio>
 
     <div>
         <div id="reader"></div> <!-- Camera feed for QR scanning -->
@@ -80,6 +81,13 @@
         let isScanning = false; // Flag to prevent scanning too frequently
 
         window.onload = startQRScanner;
+
+        const sound = document.getElementById("audio");
+
+        function playSound() {
+            sound.currentTime = 0; // Reset sound to start
+            sound.play(); // Play the sound
+        }
 
         // Start QR code scanner
         function startQRScanner() {
@@ -155,6 +163,8 @@
                                     <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
                                 bekreftelse();
+
+                                playSound(); // Play sound on successful scan
                             }
                         }
                     }
