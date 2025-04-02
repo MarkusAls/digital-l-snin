@@ -126,6 +126,7 @@
                     if (!isScanning) {
                         isScanning = true; // Block further scans temporarily
                         searchVISID(decodedText);
+                        playSound();
 
                         // Set a timeout before allowing the next scan
                         setTimeout(() => {
@@ -164,7 +165,7 @@
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
                                 bekreftelse();
 
-                                playSound(); // Play sound on successful scan
+                                // Play sound on successful scan
                             }
                         }
                     }
