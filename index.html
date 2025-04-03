@@ -8,16 +8,16 @@
             padding: 0;
             box-sizing: border-box;
         }
-
+       
         #reader {
             width: 100%;
             border-radius: 15px;
         }
-
+       
         #searchResult {
             text-align: center;
         }
-
+       
         #grønnBoks, #rødBoks {
             position: fixed;
             top: 0;
@@ -27,159 +27,106 @@
             display: none;
             z-index: 9999;
         }
-
+       
         #grønnBoks { background-color: green; }
         #rødBoks { background-color: red; }
     </style>
-
+   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Scanner with Sound</title>
+    <title>Firebase QR Scanner</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-    <audio id="scanSound" preload="auto">
-        <source src="scan.mp3" type="audio/mp3">
-    </audio>
-
-    <div>
-        <div id="reader"></div>
-    </div>
+    <audio id="scanSound" src="scan.mp3" preload="auto"></audio>
+    <div id="reader"></div>
     <div id="grønnBoks"></div>
     <div id="rødBoks"></div>
-
     <div id="searchResult">
         <p id="resultText">Skann en Strekkode for å sjekke Elev Id.</p>
     </div>
-
+   
     <script>
-        class QRScanner {
-            constructor() {
-                this.sound = document.getElementById("scanSound"); // Sound effect
-                this.scanning = true; // Flag to stop scanning
-                this.interval = null; // Store interval ID
-                this.database = firebase.database();
-
-                this.initFirebase();
-                this.startScanner();
-            }
-
-            initFirebase() {
-                const firebaseConfig = {
-                    apiKey: "AIzaSyDtx8J7NBELBdhWrPgiFyWrOtiMSYerJbo",
-                    authDomain: "test-b24b1.firebaseapp.com",
-                    databaseURL: "https://test-b24b1-default-rtdb.firebaseio.com",
-                    projectId: "test-b24b1",
-                    storageBucket: "test-b24b1.firebasestorage.app",
-                    messagingSenderId: "1058078158269",
-                    appId: "1:1058078158269:web:10ac5b50c413295e3636d4",
-                    measurementId: "G-1CWRF1Z6BQ"
-                };
-                firebase.initializeApp(firebaseConfig);
-            }
-
-            playSound() {
-                this.sound.currentTime = 0;
-                this.sound.play();
-            }
-
-            startScanner() {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(() => {
-                        const html5QrCode = new Html5Qrcode("reader");
-
-                        html5QrCode.start(
-                            { facingMode: "environment" },
-                            {
-                                fps: 10,
-                                qrbox: { width: window.innerWidth * 0.7, height: window.innerWidth * 0.37 }
-                            },
-                            (decodedText) => this.processScan(decodedText, html5QrCode),
-                            (error) => console.warn("Scan error:", error)
-                        );
-                    })
-                    .catch(error => {
-                        console.error("Camera access error:", error);
-                        document.getElementById("resultText").innerText = "Kameratilgang nektet!";
-                    });
-            }
-
-            processScan(decodedText, scanner) {
-                if (!this.scanning) return;
-
-                this.scanning = false; // Stop further scanning
-                this.playSound();
-                alert("✅ QR Code Scanned: " + decodedText);
-                this.searchVISID(decodedText);
-
-                setTimeout(() => {
-                    this.scanning = true; // Restart scanning after delay
-                }, 5000);
-            }
-
-            searchVISID(visid) {
-                const resultText = document.getElementById('resultText');
-
-                this.database.ref('/').once('value')
-                    .then((snapshot) => {
-                        const data = snapshot.val();
-                        let found = false;
-                        let foundKey = null;
-
-                        if (data) {
-                            for (const key in data) {
-                                if (data[key].VISID == visid) {
-                                    found = true;
-                                    foundKey = key;
-
-                                    resultText.innerHTML = `
-                                        <strong>Fornavn:</strong> ${data[key].Fornavn} <br>
-                                        <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
-                                        <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
-                                    this.confirmScan(foundKey);
-                                }
-                            }
-                        }
-
-                        if (!found) {
-                            resultText.innerHTML = `<span style="color: red;">✖ VISID ikke funnet!</span>`;
-                        }
-                    })
-                    .catch(error => console.error('Database error:', error));
-            }
-
-            confirmScan(foundKey) {
-                if (!foundKey) return;
-
-                this.database.ref(`/${foundKey}`).once('value')
-                    .then((snapshot) => {
-                        const userData = snapshot.val();
-                        const resultText = document.getElementById('resultText');
-
-                        if (userData && userData.Status === true) {
-                            resultText.innerHTML += `<br><span style="color: red; font-size:30px;">❌ ID allerede registrert!</span>`;
-                            this.showFeedback("rødBoks");
-                        } else {
-                            this.database.ref(`/${foundKey}`).update({ Status: true })
-                                .then(() => {
-                                    resultText.innerHTML += `<br><span style="color: green;">✔ Registrering fullført!</span>`;
-                                    this.showFeedback("grønnBoks");
-                                })
-                                .catch(error => console.error('Update error:', error));
-                        }
-                    })
-                    .catch(error => console.error('Data fetch error:', error));
-            }
-
-            showFeedback(boxId) {
-                document.getElementById(boxId).style.display = "block";
-                setTimeout(() => document.getElementById(boxId).style.display = "none", 1000);
-            }
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtx...",
+            authDomain: "test-b24b1.firebaseapp.com",
+            databaseURL: "https://test-b24b1-default-rtdb.firebaseio.com",
+            projectId: "test-b24b1",
+            storageBucket: "test-b24b1.firebasestorage.app",
+            messagingSenderId: "1058078158269",
+            appId: "1:1058078158269:web:10ac5b50c413295e3636d4"
+        };
+       
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let isScanning = false;
+       
+        function playSound() {
+            const sound = document.getElementById("scanSound");
+            sound.currentTime = 0;
+            sound.play();
         }
-
-        window.onload = () => new QRScanner();
+       
+        function startQRScanner() {
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 700, height: 300 } },
+                (decodedText) => {
+                    if (!isScanning) {
+                        isScanning = true;
+                        playSound();
+                        searchVISID(decodedText);
+                        setTimeout(() => { isScanning = false; }, 5000);
+                    }
+                },
+                (errorMessage) => {
+                    console.warn("QR scanning error:", errorMessage);
+                }
+            );
+        }
+       
+        function searchVISID(visid) {
+            const resultText = document.getElementById("resultText");
+            database.ref('/').once('value').then(snapshot => {
+                const data = snapshot.val();
+                let found = false;
+                for (const key in data) {
+                    if (data[key].VISID == visid) {
+                        found = true;
+                        resultText.innerHTML = `<strong>Fornavn:</strong> ${data[key].Fornavn} <br>
+                                               <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
+                                               <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
+                        confirmScan(key);
+                    }
+                }
+                if (!found) resultText.innerHTML = "<span style='color: red;'>✖ VISID ikke funnet!</span>";
+            }).catch(error => console.error("Database error:", error));
+        }
+       
+        function confirmScan(foundKey) {
+            if (!foundKey) return;
+            database.ref(`/${foundKey}`).once('value').then(snapshot => {
+                const userData = snapshot.val();
+                if (userData.Status) {
+                    document.getElementById("resultText").innerHTML += "<br><span style='color: red;'>❌ ID allerede registrert!</span>";
+                    document.getElementById("rødBoks").style.display = "block";
+                    setTimeout(() => document.getElementById("rødBoks").style.display = "none", 1000);
+                } else {
+                    database.ref(`/${foundKey}`).update({ Status: true }).then(() => {
+                        document.getElementById("resultText").innerHTML += "<br><span style='color: green;'>✔ Registrering fullført!</span>";
+                        document.getElementById("grønnBoks").style.display = "block";
+                        setTimeout(() => document.getElementById("grønnBoks").style.display = "none", 1000);
+                    });
+                }
+            });
+        }
+       
+        window.onload = startQRScanner;
     </script>
 </body>
 </html>
+ 
+ 
