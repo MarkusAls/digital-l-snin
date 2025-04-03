@@ -87,7 +87,6 @@
 
         function playSound() {
             document.getElementById("test").innerHTML = "Scanning..."; // Update text to indicate scanning
-            sound.currentTime = 0; // Reset sound to start
             sound.play(); // Play the sound
         }
 
@@ -129,6 +128,7 @@
                         isScanning = true; // Block further scans temporarily
                         searchVISID(decodedText);
                         playSound(); // Play sound on successful scan
+                         // Play sound on successful scan
 
                         // Set a timeout before allowing the next scan
                         setTimeout(() => {
@@ -167,7 +167,7 @@
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
                                 bekreftelse();
 
-                                // Play sound on successful scan
+                               
                             }
                         }
                     }
