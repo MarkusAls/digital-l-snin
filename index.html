@@ -84,26 +84,10 @@
 
         window.onload = startQRScanner;
 
-        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        let soundSource = audioContext.createBufferSource();
-        let audioElement = document.getElementById("audio");
-
-        function playSound() {
-            let request = new XMLHttpRequest();
-            request.open("GET", "scan.mp3", true);
-            request.responseType = "arraybuffer";
-            
-            request.onload = function() {
-                audioContext.decodeAudioData(request.response, function(buffer) {
-                    soundSource.buffer = buffer;
-                    soundSource.connect(audioContext.destination);
-                    soundSource.start(0);
-                });
-            };
-
-            request.send();
+        function playCustomSound() {
+            const audioElement = document.getElementById("audio");
+            audioElement.play();
         }
-
 
         // Start QR code scanner
         function startQRScanner() {
