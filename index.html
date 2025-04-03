@@ -48,7 +48,7 @@
     <script src="https://unpkg.com/html5-qrcode"></script> <!-- QR-scanner library -->
 </head>
 <body>
-    <audio id="audio" src="scan.mp3" autoplay></audio>
+    <audio id="audio" src="scan.mp3" preload="auto" autoplay></audio>
 
     <div>
         <div id="reader"></div> <!-- Camera feed for QR scanning -->
@@ -84,10 +84,26 @@
 
         window.onload = startQRScanner;
 
-        function playCustomSound() {
-            const audioElement = document.getElementById("audio");
-            audioElement.play();
-        }
+        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let soundSource = audioContext.createBufferSource();
+        let audioElement = document.getElementById("audio");
+
+        function playSound() {
+            let request = new XMLHttpRequest();
+            request.open("GET", "scan.mp3", true);
+            request.responseType = "arraybuffer";
+            
+            request.onload = function() {
+                audioContext.decodeAudioData(request.response, function(buffer) {
+                    soundSource.buffer = buffer;
+                    soundSource.connect(audioContext.destination);
+                    soundSource.start(0);
+                });
+            };
+
+    request.send();
+}
+
 
         // Start QR code scanner
         function startQRScanner() {
@@ -107,7 +123,6 @@
                         errorMessage = "Appen har ikke tilgang til kameraet.";
                     }
                     text.innerHTML = errorMessage + ": " + error;
-                    playCustomSound()
                 });
 
             const html5QrCode = new Html5Qrcode("reader");
@@ -126,10 +141,8 @@
                 },
                 (decodedText) => {
                     if (!isScanning) {
-                        playCustomSound()
                         isScanning = true; // Block further scans temporarily
                         searchVISID(decodedText);
-                        playCustomSound()
                          // Play sound on successful scan
                          // Play sound on successful scan
 
@@ -151,7 +164,6 @@
         // Search for VISID in the Firebase database
         const searchVISID = (visid) => {
             const resultText1 = document.getElementById('resultText');
-            playCustomSound()
 
             database.ref('/').once('value')
                 .then((snapshot) => {
@@ -170,7 +182,6 @@
                                     <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
                                 bekreftelse();
-                                playCustomSound()
 
                                
                             }
@@ -180,7 +191,6 @@
                     if (!found) {
                         resultText1.innerHTML = `<span style="color: red; ">✖ VISID ikke funnet!</span>`;
                         foundKey = null;
-                        playCustomSound()
                     }
                 })
                 .catch((error) => {
@@ -192,7 +202,6 @@
         // Confirmation and registration logic
         function bekreftelse() {
             const resultText2 = document.getElementById('resultText');
-            playCustomSound()
 
             if (!foundKey) {
                 resultText2.innerText = "Du må skanne en gyldig VISID først!";
@@ -202,7 +211,6 @@
             database.ref(`/${foundKey}`).once('value')
                 .then((snapshot) => {
                     const userData = snapshot.val();
-                    playCustomSound()
 
                     if (userData && userData.Status === true) {
                         resultText2.innerHTML += `<br><span style="color: red; font-size:30px; ">❌ Denne Elev Id-en er allerede registrert!</span>`;
