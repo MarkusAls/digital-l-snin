@@ -38,22 +38,6 @@
         #rødBoks {
             background-color: red;
         }
-
-        /* Style for the button */
-        #scanButton {
-            display: none; /* Hidden by default */
-            padding: 10px 20px;
-            font-size: 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #scanButtonVisible {
-            display: block; /* Make it visible when needed */
-        }
     </style>
 
     <meta charset="UTF-8">
@@ -76,8 +60,8 @@
         <p id="resultText">Skann en Strekkode for å sjekke Elev Id.</p>
     </div>
 
-    <button id="scanButton" onclick="startQRScanner(); playSound();">Start Scanning</button> <!-- Hidden button -->
-    <button id="scanButtonVisible" onclick="playSound();">Trykk for å Bekrefte</button> <!-- Visible button after scanning -->
+    <button id="soundButton" onclick="playSound()">Sound button</button>
+ <!-- Hidden button to play sound -->
 
     <script>
         // Firebase configuration
@@ -101,15 +85,16 @@
 
         window.onload = startQRScanner;
 
-        function triggerButtonClick() {
-            // Simulate a button click
-            document.getElementById("scanButton").click();
+        function playSound() {
+            const audioElement = document.getElementById("audio");
+            audioElement.currentTime = 0; // Reset to the start of the audio
+            audioElement.play(); // Play the sound
         }
 
         // Start QR code scanner
         function startQRScanner() {
             const text = document.getElementById("resultText");
-            playSound(); // Play sound when starting the scanner
+            document.getElementById("soundButton").click(); // Play sound when starting the scanner
 
             // Request camera access
             navigator.mediaDevices.getUserMedia({ video: true })
@@ -144,29 +129,22 @@
                     if (!isScanning) {
                         isScanning = true; // Block further scans temporarily
                         searchVISID(decodedText);
+                         // Play sound on successful scan
+                         // Play sound on successful scan
 
-                        // Kall på funksjonen for å simulere et knappetrykk (f.eks. etter skanning)
-                        document.getElementById("scanButtonVisible").click(); // Simulerer klikk på bekreftelsesknappen
-
-                        // Sett en timeout før neste skanning er tillatt
+                        // Set a timeout before allowing the next scan
                         setTimeout(() => {
-                            isScanning = false; // Tillat ny skanning
-                        }, 5000); // Forsinkelse på 5 sekunder
+                            isScanning = false; // Allow scanning again
+                        }, 5000); // Delay in milliseconds (e.g., 5000 ms = 5 seconds)
                     }
                 },
                 (errorMessage) => {
-                    // Håndter skanningsfeil (hvis noen)
+                    // Log scanning failure (if any)
                     console.warn("QR-skanning feilet:", errorMessage);
                 }
             ).catch((err) => {
                 console.error("Klarte ikke å starte QR-skanner:", err);
-            });
-        }
-
-        function playSound() {
-            console.log("Sound played");
-            let sound = new Audio("scan.mp3");
-            sound.play();
+            })
         }
 
         // Search for VISID in the Firebase database
@@ -190,6 +168,8 @@
                                     <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
                                 bekreftelse();
+
+                               
                             }
                         }
                     }
