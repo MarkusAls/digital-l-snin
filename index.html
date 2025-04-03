@@ -48,7 +48,9 @@
     <script src="https://unpkg.com/html5-qrcode"></script> <!-- QR-scanner library -->
 </head>
 <body>
-    <audio id="audio" src="scan.mp3" preload="auto"></audio>
+    <audio id="audio" preload="auto">
+        <source src="scan.mp3" type="audio/mp3">
+    </audio>
 
     <div>
         <div id="reader"></div> <!-- Camera feed for QR scanning -->
@@ -59,9 +61,8 @@
     <div id="searchResult">
         <p id="resultText">Skann en Strekkode for å sjekke Elev Id.</p>
     </div>
-
-    <button id="soundButton" onclick="playSound()">Sound button</button>
-    <!-- Hidden button to play sound -->
+    <button id="startScanButton">Start Scanning</button> <!-- Button to start scanning -->
+    
 
     <script>
         // Firebase configuration
@@ -85,31 +86,25 @@
 
         window.onload = startQRScanner;
 
+        const audioElement = document.getElementById("audio");
+        const startScanButton = document.getElementById("startScanButton");
+
+        // Function to play the sound
         function playSound() {
-            const audioElement = document.getElementById("audio");
             audioElement.currentTime = 0; // Reset to the start of the audio
             audioElement.play(); // Play the sound
         }
 
-        // Function to simulate a click event at the button's position
+        // Function to simulate a click event (for the sound button)
         function simulateClickOnButton() {
-            const button = document.getElementById("soundButton");
-
-            // Get the button's position
-            const rect = button.getBoundingClientRect();
-            const x = rect.left + rect.width / 2; // X coordinate (center of the button)
-            const y = rect.top + rect.height / 2; // Y coordinate (center of the button)
-
-            // Create a MouseEvent and simulate a click at the button's center
-            const event = new MouseEvent('click', {
-                bubbles: true,
-                cancelable: true,
-                clientX: x,
-                clientY: y
-            });
-
-            button.dispatchEvent(event); // Dispatch the click event on the button
+            playSound();  // Play sound immediately when this function is called
         }
+
+        // Start QR scanner after a user clicks the button
+        startScanButton.addEventListener("click", function() {
+            playSound(); // Play sound when the button is clicked
+            startQRScanner(); // Start the QR scanner (or any scanning process you want)
+        });
 
         // Start QR code scanner
         function startQRScanner() {
@@ -117,21 +112,44 @@
 
             // Simulate a click on the sound button
             simulateClickOnButton(); // Simulating the click on the sound button
-
-            // Request camera access
+            
+            // Request camera access for QR scanning
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
-                    // Camera access granted, can be used in the html5-qrcode
+                    // Camera access granted, initialize the scanner with the video feed
+                    const html5QrCode = new Html5Qrcode("reader");
+
+                    // Set up QR scanner options
+                    html5QrCode.start(
+                        { facingMode: "environment" }, // Use the rear camera
+                        {
+                            fps: 10, // Set FPS (frames per second)
+                            qrbox: { width: window.innerWidth * 0.7, height: window.innerWidth * 0.37 }, // QR box size
+                            numOfWorkers: 4, // Increase speed by using multiple workers
+                        },
+                        (decodedText) => {
+                            console.log("QR Code scanned:", decodedText);
+                            // Handle decoded text (e.g., search for VISID)
+                            searchVISID(decodedText); 
+                        },
+                        (errorMessage) => {
+                            console.warn("QR scan failed:", errorMessage);
+                        }
+                    ).catch((err) => {
+                        console.error("Error starting QR scanner:", err);
+                        text.innerText = "Error starting the scanner.";
+                    });
                 })
-                .catch(error => {
-                    let errorMessage = "Kameratilgang nektet";
+                .catch((error) => {
+                    let errorMessage = "Camera access denied";
                     if (error.name === 'NotFoundError') {
-                        errorMessage = "Ingen kamera funnet på enheten.";
+                        errorMessage = "No camera found on the device.";
                     } else if (error.name === 'NotAllowedError') {
-                        errorMessage = "Appen har ikke tilgang til kameraet.";
+                        errorMessage = "App does not have camera access.";
                     }
                     text.innerHTML = errorMessage + ": " + error;
                 });
+        }
 
             const html5QrCode = new Html5Qrcode("reader");
             const qrBoxWidth = window.innerWidth; // Get full viewport width
