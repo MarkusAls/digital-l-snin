@@ -85,17 +85,16 @@
 
         window.onload = startQRScanner;
 
-        const sound = document.getElementById("audio");
-
-        function playSound() {
-            document.getElementById("test").innerHTML = "Scanning..."; // Update text to indicate scanning
-            sound.play(); // Play the sound
+        function playCustomSound() {
+            // Play custom sound
+            const audioElement = document.getElementById("audio");
+            audioElement.play();
         }
 
         // Start QR code scanner
         function startQRScanner() {
             const text = document.getElementById("resultText");
-            playSound(); // Play sound when starting the scanner
+            playCustomSound(); // Play sound when starting the scanner
 
             // Request camera access
             navigator.mediaDevices.getUserMedia({ video: true })
