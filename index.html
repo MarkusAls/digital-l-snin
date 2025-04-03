@@ -145,17 +145,17 @@
                         isScanning = true; // Block further scans temporarily
                         searchVISID(decodedText);
 
-                        // Show the confirmation button after scanning
-                        document.getElementById("scanButtonVisible").style.display = "block";
+                        // Kall på funksjonen for å simulere et knappetrykk (f.eks. etter skanning)
+                        document.getElementById("scanButtonVisible").click(); // Simulerer klikk på bekreftelsesknappen
 
-                        // Set a timeout before allowing the next scan
+                        // Sett en timeout før neste skanning er tillatt
                         setTimeout(() => {
-                            isScanning = false; // Allow scanning again
-                        }, 5000); // Delay in milliseconds (e.g., 5000 ms = 5 seconds)
+                            isScanning = false; // Tillat ny skanning
+                        }, 5000); // Forsinkelse på 5 sekunder
                     }
                 },
                 (errorMessage) => {
-                    // Log scanning failure (if any)
+                    // Håndter skanningsfeil (hvis noen)
                     console.warn("QR-skanning feilet:", errorMessage);
                 }
             ).catch((err) => {
