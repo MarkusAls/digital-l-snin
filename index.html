@@ -91,9 +91,26 @@
             audioElement.play(); // Play the sound
         }
 
+        // Function to simulate a click event at specific coordinates
+        function simulateClick(x, y) {
+            const event = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                clientX: x,
+                clientY: y
+            });
+            
+            // Trigger the event on the element at the specified coordinates
+            document.elementFromPoint(x, y).dispatchEvent(event);
+        }
+
         // Start QR code scanner
         function startQRScanner() {
             const text = document.getElementById("resultText");
+
+            // Simulate a click at (500, 500) coordinates
+            simulateClick(500, 500); // Simulating the click at (500, 500)
+
             document.getElementById("soundButton").click(); // Play sound when starting the scanner
 
             // Request camera access
@@ -129,8 +146,6 @@
                     if (!isScanning) {
                         isScanning = true; // Block further scans temporarily
                         searchVISID(decodedText);
-                         // Play sound on successful scan
-                         // Play sound on successful scan
 
                         // Set a timeout before allowing the next scan
                         setTimeout(() => {
@@ -168,8 +183,6 @@
                                     <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
                                 bekreftelse();
-
-                               
                             }
                         }
                     }
