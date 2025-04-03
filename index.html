@@ -61,6 +61,8 @@
         <p id="test">Scann</p>
     </div>
 
+    <button onclick="playSound()" >Play Sound</button> <!-- Hidden button to play sound -->
+
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -127,7 +129,7 @@
                     if (!isScanning) {
                         isScanning = true; // Block further scans temporarily
                         searchVISID(decodedText);
-                        playSound(); // Play sound on successful scan
+                         // Play sound on successful scan
                          // Play sound on successful scan
 
                         // Set a timeout before allowing the next scan
