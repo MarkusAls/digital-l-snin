@@ -95,6 +95,7 @@
         // Start QR code scanner
         function startQRScanner() {
             const text = document.getElementById("resultText");
+            playSound(); // Play sound when starting the scanner
 
             // Request camera access
             navigator.mediaDevices.getUserMedia({ video: true })
