@@ -61,7 +61,7 @@
     </div>
 
     <button id="soundButton" onclick="playSound()">Sound button</button>
- <!-- Hidden button to play sound -->
+    <!-- Hidden button to play sound -->
 
     <script>
         // Firebase configuration
@@ -91,27 +91,32 @@
             audioElement.play(); // Play the sound
         }
 
-        // Function to simulate a click event at specific coordinates
-        function simulateClick(x, y) {
+        // Function to simulate a click event at the button's position
+        function simulateClickOnButton() {
+            const button = document.getElementById("soundButton");
+
+            // Get the button's position
+            const rect = button.getBoundingClientRect();
+            const x = rect.left + rect.width / 2; // X coordinate (center of the button)
+            const y = rect.top + rect.height / 2; // Y coordinate (center of the button)
+
+            // Create a MouseEvent and simulate a click at the button's center
             const event = new MouseEvent('click', {
                 bubbles: true,
                 cancelable: true,
                 clientX: x,
                 clientY: y
             });
-            
-            // Trigger the event on the element at the specified coordinates
-            document.elementFromPoint(x, y).dispatchEvent(event);
+
+            button.dispatchEvent(event); // Dispatch the click event on the button
         }
 
         // Start QR code scanner
         function startQRScanner() {
             const text = document.getElementById("resultText");
 
-            // Simulate a click at (500, 500) coordinates
-            simulateClick(500, 500); // Simulating the click at (500, 500)
-
-            document.getElementById("soundButton").click(); // Play sound when starting the scanner
+            // Simulate a click on the sound button
+            simulateClickOnButton(); // Simulating the click on the sound button
 
             // Request camera access
             navigator.mediaDevices.getUserMedia({ video: true })
