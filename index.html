@@ -48,7 +48,7 @@
     <script src="https://unpkg.com/html5-qrcode"></script> <!-- QR-scanner library -->
 </head>
 <body>
-    <audio id="audio" src="scan.mp3" preload="auto" autoplay></audio>
+    <audio id="audio" src="scan.mp3" preload="auto"></audio>
 
     <div>
         <div id="reader"></div> <!-- Camera feed for QR scanning -->
@@ -86,7 +86,10 @@
 
         function playCustomSound() {
             const audioElement = document.getElementById("audio");
-            audioElement.play();
+            audioElement.currentTime = 0; // Reset to the start of the audio
+            audioElement.play().catch(error => {
+                console.error("Error playing sound:", error);
+            });
         }
 
         // Start QR code scanner
