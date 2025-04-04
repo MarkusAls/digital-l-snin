@@ -163,8 +163,8 @@
 
                                 // Display student details
                                 resultText1.innerHTML = `
-                                    <strong>Fornavn:</strong> ${data[key].Fornavn} <br>
-                                    <strong>Etternavn:</strong> ${data[key].Etternavn} <br>
+                                    <strong>Navn:</strong> ${data[key].Fornavn} 
+                                                            ${data[key].Etternavn} <br>
                                     <strong>Elev Id:</strong> ${data[key].VISID} <br>`;
                                 bekreftelse();
 
@@ -222,10 +222,6 @@
                                 }, 1000);
                                 stopSound(); // Stop sound interval on success
                             })
-                            .catch(error => {
-                                console.error('Feil ved oppdatering av Status:', error);
-                                resultText2.innerHTML += `<br><span style="color: red;">✖ Kunne ikke oppdatere Status!</span>`;
-                            });
                     }
                 })
                 .catch(error => {
